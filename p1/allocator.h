@@ -1,5 +1,9 @@
 #include <stdexcept>
 #include <string>
+#include <vector>
+#include <stdio.h>
+#include <cstring>
+#include "stdio.h"
 
 enum class AllocErrorType {
     InvalidFree,
@@ -19,22 +23,43 @@ public:
     AllocErrorType getType() const { return type; }
 };
 
-class Allocator;
+using std::vector;
 
-class Pointer {
-public:
-    void *get() const { return 0; } 
-};
+class Pointer;
 
 class Allocator {
-public:
-    Allocator(void *base, size_t size) {}
-    
-    Pointer alloc(size_t N) { return Pointer(); }
-    void realloc(Pointer &p, size_t N) {}
-    void free(Pointer &p) {}
+private:
+    char *base;
+    vector <bool> memory_map;
 
-    void defrag() {}
+    vector<char*> pointers;
+
+    void mark_memory (int from, int size, bool value);
+
+public:
+    Allocator(void *base_, int size);
+
+    void move_pointers (char *from, char *to);
+
+    Pointer alloc(int N);
+    void realloc(Pointer &p, int N);
+    void free(Pointer &p, bool to_null = true);
+
+    void defrag();
     std::string dump() { return ""; }
+
+    char *get (int index);
 };
 
+
+class Pointer {
+private:
+    Allocator* alloc;
+    int index;
+
+public:
+    Pointer () : Pointer (nullptr, 0) {}
+    Pointer (Allocator* alloc_, int index_) : alloc (alloc_), index (index_) {}
+
+    char *get() const { return (alloc)? (alloc -> get(index)) : nullptr; }
+};

@@ -2,7 +2,6 @@ TEST_FILES = ../thirdparty/gtest/gtest-all.cc ../thirdparty/gtest/gtest_main.cc
 SRC = allocator.cpp allocator_test.cpp
 HDR = allocator.h
 
-
 all: tests.done
 
 allocator_test: $(SRC) $(HDR)
