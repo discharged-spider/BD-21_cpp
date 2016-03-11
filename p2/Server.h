@@ -28,14 +28,14 @@ private:
     int accept_client();
 public:
     Server(int port_ = 3100) :
-        port (port_),
+        port(port_),
         server_fd(-1),
-        serv_addr ()
+        serv_addr()
     {}
 
-    ~Server ()
+    ~Server()
     {
-        close (server_fd);
+        close(server_fd);
     }
 
     void start();

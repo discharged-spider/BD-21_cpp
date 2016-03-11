@@ -1,5 +1,7 @@
 #include "Server.h"
 
+#include "NetworkTools.h"
+
 #include <sys/epoll.h>
 
 #include <string>
@@ -18,24 +20,6 @@ using std::cout;
 using std::endl;
 
 using std::map;
-
-static int make_socket_non_blocking (int sfd)
-{
-    int flags = fcntl (sfd, F_GETFL, 0);
-    if (flags == -1)
-    {
-        throw std::system_error(errno, std::system_category());
-    }
-
-    flags |= O_NONBLOCK;
-    int s = fcntl (sfd, F_SETFL, flags);
-    if (s == -1)
-    {
-        throw std::system_error(errno, std::system_category());
-    }
-
-    return 0;
-}
 
 void Server::init_connection()
 {
@@ -76,9 +60,6 @@ void Server::init_connection()
 }
 
 #define MAX_EVENTS 64
-
-#define BUF_SIZE 1024
-
 
 void Server::start()
 {
@@ -210,6 +191,10 @@ void Server::start()
                 string& str = data [input_fd].stream;
                 str.erase (std::remove(str.begin(), str.end(), '\r'), str.end());
 
+                string start = "from ";
+                start += std::to_string(input_fd);
+                start += ":";
+
                 while (true)
                 {
                     auto pos = str.find('\n');
@@ -225,6 +210,8 @@ void Server::start()
                     cout << message << endl;
 
                     message += '\n';
+
+                    message = start + message;
 
                     auto buf_msg = message.c_str();
                     auto len = message.size();

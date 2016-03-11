@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include "Server.h"
+#include "Client.h"
 
 using std::cout;
 using std::endl;
@@ -11,9 +11,9 @@ int main()
 {
     try
     {
-        Server server(3100);
+        Client client(3100);
 
-        server.start();
+        client.start();
     }
     catch (std::runtime_error error)
     {

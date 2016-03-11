@@ -102,6 +102,19 @@ depend:
 .PHONY : depend
 
 #=============================================================================
+# Target rules for targets named chatclt
+
+# Build rule for target.
+chatclt: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 chatclt
+.PHONY : chatclt
+
+# fast build rule for target.
+chatclt/fast:
+	$(MAKE) -f CMakeFiles/chatclt.dir/build.make CMakeFiles/chatclt.dir/build
+.PHONY : chatclt/fast
+
+#=============================================================================
 # Target rules for targets named chatsrv
 
 # Build rule for target.
@@ -113,6 +126,30 @@ chatsrv: cmake_check_build_system
 chatsrv/fast:
 	$(MAKE) -f CMakeFiles/chatsrv.dir/build.make CMakeFiles/chatsrv.dir/build
 .PHONY : chatsrv/fast
+
+Client.o: Client.cpp.o
+.PHONY : Client.o
+
+# target to build an object file
+Client.cpp.o:
+	$(MAKE) -f CMakeFiles/chatclt.dir/build.make CMakeFiles/chatclt.dir/Client.cpp.o
+.PHONY : Client.cpp.o
+
+Client.i: Client.cpp.i
+.PHONY : Client.i
+
+# target to preprocess a source file
+Client.cpp.i:
+	$(MAKE) -f CMakeFiles/chatclt.dir/build.make CMakeFiles/chatclt.dir/Client.cpp.i
+.PHONY : Client.cpp.i
+
+Client.s: Client.cpp.s
+.PHONY : Client.s
+
+# target to generate assembly for a file
+Client.cpp.s:
+	$(MAKE) -f CMakeFiles/chatclt.dir/build.make CMakeFiles/chatclt.dir/Client.cpp.s
+.PHONY : Client.cpp.s
 
 Server.o: Server.cpp.o
 .PHONY : Server.o
@@ -137,6 +174,30 @@ Server.s: Server.cpp.s
 Server.cpp.s:
 	$(MAKE) -f CMakeFiles/chatsrv.dir/build.make CMakeFiles/chatsrv.dir/Server.cpp.s
 .PHONY : Server.cpp.s
+
+chatclt.o: chatclt.cpp.o
+.PHONY : chatclt.o
+
+# target to build an object file
+chatclt.cpp.o:
+	$(MAKE) -f CMakeFiles/chatclt.dir/build.make CMakeFiles/chatclt.dir/chatclt.cpp.o
+.PHONY : chatclt.cpp.o
+
+chatclt.i: chatclt.cpp.i
+.PHONY : chatclt.i
+
+# target to preprocess a source file
+chatclt.cpp.i:
+	$(MAKE) -f CMakeFiles/chatclt.dir/build.make CMakeFiles/chatclt.dir/chatclt.cpp.i
+.PHONY : chatclt.cpp.i
+
+chatclt.s: chatclt.cpp.s
+.PHONY : chatclt.s
+
+# target to generate assembly for a file
+chatclt.cpp.s:
+	$(MAKE) -f CMakeFiles/chatclt.dir/build.make CMakeFiles/chatclt.dir/chatclt.cpp.s
+.PHONY : chatclt.cpp.s
 
 chatsrv.o: chatsrv.cpp.o
 .PHONY : chatsrv.o
@@ -170,10 +231,17 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
+	@echo "... chatclt"
 	@echo "... chatsrv"
+	@echo "... Client.o"
+	@echo "... Client.i"
+	@echo "... Client.s"
 	@echo "... Server.o"
 	@echo "... Server.i"
 	@echo "... Server.s"
+	@echo "... chatclt.o"
+	@echo "... chatclt.i"
+	@echo "... chatclt.s"
 	@echo "... chatsrv.o"
 	@echo "... chatsrv.i"
 	@echo "... chatsrv.s"
