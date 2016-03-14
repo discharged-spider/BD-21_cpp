@@ -1,0 +1,10 @@
+*
+
+!.gitignore
+
+!*.cpp
+!*.h
+!*.txt
+
+!CMakeLists.txt
+!Makefile
