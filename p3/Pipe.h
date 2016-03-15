@@ -13,8 +13,8 @@
 using std::cout;
 using std::endl;
 
-//#define DEBUG(CODE) {CODE;}
-#define DEBUG(CODE)
+#define DEBUG(CODE) {CODE;}
+//#define DEBUG(CODE)
 
 using namespace boost::asio;
 
@@ -43,7 +43,9 @@ private:
     string msg;
 
     bool write_avaliable_ = false;
-    bool write_free_      = true;
+    bool write_free_      = false;
+
+    bool read_avaliable_ = false;
 
     char read_buf_  [BUFF_SIZE];
     char write_buf_ [BUFF_SIZE];
@@ -75,18 +77,32 @@ public:
 
     void start ()
     {
+        read_avaliable_ = true;
         add_read ();
     }
 
     void start_output()
     {
         write_avaliable_ = true;
+        write_free_ = true;
         add_write ();
     }
 
     void read_complete (const error_code & err, size_t bytes)
     {
         DEBUG (cout << "read_complete" << endl;)
+
+        if (bytes > 0)
+        {
+            DEBUG (cout << "read_ok" << endl;)
+
+            msg.append (read_buf_, bytes);
+
+            if (msg != "")
+            {
+                add_write ();
+            }
+        }
 
         if (err)
         {
@@ -99,16 +115,9 @@ public:
 
             from_.close ();
 
+            read_avaliable_ = false;
+
             return;
-        }
-
-        DEBUG (cout << "read_ok" << endl;)
-
-        msg.append (read_buf_, bytes);
-
-        if (msg != "")
-        {
-            add_write ();
         }
 
         add_read ();
@@ -116,7 +125,7 @@ public:
 
     void write_complete (const error_code & err, size_t bytes)
     {
-        DEBUG (cout << "write_complete" << endl;)
+        DEBUG (cout << "write_complete " << bytes << endl;)
 
         if (err)
         {
@@ -146,7 +155,7 @@ public:
 
         if (!write_avaliable_ || !write_free_ || msg == "") return;
 
-        DEBUG (cout << "write_ok" << endl;)
+        DEBUG (cout << "writing [" << msg.size () << "]" << endl;)
 
         auto size = msg.size() > BUFF_SIZE? BUFF_SIZE : msg.size();
         for (int i = 0; i < size; i ++)
