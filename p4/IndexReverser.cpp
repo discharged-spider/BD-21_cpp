@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <iostream>
+#include <unistd.h>
 #include "IndexReverser.h"
 #include "BufferFileReader.h"
 
@@ -11,6 +12,10 @@ void IndexReverser::make ()
     assert (input != nullptr);
     assert (temp != nullptr);
 
+    fseeko64 (input, 0L, SEEK_END);
+    input_size_ = ftell (input);
+    fseeko64 (input, 0L, SEEK_SET);
+
     reverse_parts (input, temp);
 
     fclose (input);
@@ -18,6 +23,7 @@ void IndexReverser::make ()
     FILE* output = fopen (output_.c_str(),  "wb");
     assert (output != nullptr);
 
+    input_size_ = ftell (temp);
     fseeko64 (temp, 0, SEEK_SET);
 
     create_index (temp, output);
@@ -37,8 +43,10 @@ void IndexReverser::reverse_parts(FILE *input, FILE *output)
     typedef pair<long, long> dict_pair;
     vector <dict_pair> words;
 
-    while (reader.refresh () || reader.available () > 0)
+    while (reader.available () > FIRST_STEP_LIMIT / 3 || reader.refresh () || reader.available () > 0)
     {
+        std::cout << "First step progress: " << print_memory (ftello64 (input)) << " from " << print_memory (input_size_) << std::endl;
+
         parts_.push_back (ftello64 (output));
 
         //for each data chunk
@@ -149,8 +157,16 @@ void IndexReverser::create_index (FILE *input, FILE *output)
     fwrite (&zero, sizeof (long), 1, output);
     fwrite (&zero, sizeof (long), 1, output);
 
+    int previous_p = -1;
     for (int doc_i = 0; doc_i < words_.size(); doc_i ++)
     {
+        auto p = (int) ((double)doc_i / words_.size() * 100);
+        if (p != previous_p)
+        {
+            previous_p = p;
+            std::cout << "Second step progress: " << (p + 1) << "%" << std::endl;
+        }
+
         std::sort (readers.begin(), readers.end(), comp);
 
         assert (readers [0].available<long> ());
@@ -223,6 +239,17 @@ void IndexReverser::create_index (FILE *input, FILE *output)
         fwrite (&offsets [i], sizeof (long), 1, output);
     }
 }
+
+string IndexReverser::print_memory (off64_t bytes)
+{
+    if (bytes == 0) return string ("0 Byte");
+    long k = 1024; // or 1024 for binary
+    char sizes [][6] = {"Bytes", "KB", "MB", "GB", "TB", "PB"};
+    int i = (int) (log(bytes) / log(k));
+
+    return std::to_string ((int) (bytes / pow (k, i))) + " " + sizes [i];
+}
+
 
 
 

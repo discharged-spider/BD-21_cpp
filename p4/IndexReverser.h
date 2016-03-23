@@ -5,7 +5,7 @@
 #include <vector>
 
 //in bytes
-#define MEMORY_LIMIT (1024)
+#define MEMORY_LIMIT (1024 * 1024) //1GB
 #define FIRST_STEP_LIMIT  (MEMORY_LIMIT / 2)
 #define SECOND_STEP_LIMIT (MEMORY_LIMIT)
 
@@ -24,6 +24,8 @@ private:
     vector <long> words_;
     vector <off64_t > parts_;
 
+    off64_t input_size_;
+
     void reverse_parts (FILE* input, FILE* output);
     void create_index (FILE* input, FILE* output);
 
@@ -34,10 +36,14 @@ public:
         temp_ (temp),
 
         words_ (),
-        parts_ ()
+        parts_ (),
+
+        input_size_ (0)
     {}
 
     void make ();
+
+    string print_memory (off64_t memory);
 };
 
 

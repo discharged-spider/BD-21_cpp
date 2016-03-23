@@ -1,3 +1,6 @@
+//OS: Linux Ubuntu
+//Little endian
+
 #include <iostream>
 #include "IndexReverser.h"
 
