@@ -222,8 +222,8 @@ void Server::start()
                         {
                             cout << "connection terminated (while send)" << endl;
 
-                            data.erase (cur_event.data.fd);
-                            close (cur_event.data.fd);
+                            data.erase (client_fd);
+                            close (client_fd);
                         }
                     }
                 }

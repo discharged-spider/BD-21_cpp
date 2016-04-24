@@ -3,15 +3,18 @@
 
 #include <string>
 #include <vector>
+#include <queue>
+#include <set>
 
 //in bytes
-#define MEMORY_LIMIT (1024 * 1024) //1GB
+#define MEMORY_LIMIT (1024 * 1024 * 1024) //1GB
 #define FIRST_STEP_LIMIT  (MEMORY_LIMIT / 2)
 #define SECOND_STEP_LIMIT (MEMORY_LIMIT)
 
 using std::string;
 
 using std::vector;
+using std::set;
 using std::pair;
 
 class IndexReverser
@@ -21,7 +24,7 @@ private:
     string output_;
     string temp_;
 
-    vector <long> words_;
+    set <long> words_;
     vector <off64_t > parts_;
 
     off64_t input_size_;

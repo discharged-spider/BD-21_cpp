@@ -78,6 +78,8 @@ void IndexReverser::reverse_parts(FILE *input, FILE *output)
             if (end) break;
         }
 
+        std::cout << "First step progress: " << words.size() << " words" << std::endl;
+
         auto comp = [] (dict_pair a, dict_pair b)
         {
             if (a.first != b.first) return a.first < b.first;
@@ -86,15 +88,14 @@ void IndexReverser::reverse_parts(FILE *input, FILE *output)
 
         std::sort (words.begin(), words.end (), comp);
 
+        std::cout << "First step progress: sorted" << std::endl;
+
         int last_pos = 0;
         for (int i = 0; i <= words.size(); i ++)
         {
             if (i == words.size () || words [last_pos].first != words [i].first)
             {
-                if (std::find (words_.begin (), words_.end (), words [last_pos].first) == words_.end ())
-                {
-                    words_.push_back (words [last_pos].first);
-                }
+                words_.insert (words [last_pos].first);
 
                 fwrite (&words [last_pos].first, sizeof (long), 1, output);
 
@@ -145,7 +146,6 @@ void IndexReverser::create_index (FILE *input, FILE *output)
         return reader_a.get <long> () < reader_b.get <long> ();
     };
 
-    std::sort (words_.begin(), words_.end());
     for (auto word : words_)
     {
         fwrite (&word, sizeof (long), 1, output);
@@ -181,7 +181,7 @@ void IndexReverser::create_index (FILE *input, FILE *output)
             assert (readers [size].read<long> () == current_word);
         }
 
-        assert (current_word == words_ [doc_i]);
+        //assert (current_word == words_ [doc_i]);
 
         for (int i = 0; i < size; i ++)
         {
@@ -233,17 +233,20 @@ void IndexReverser::create_index (FILE *input, FILE *output)
 
     assert (offsets.size() == words_.size());
 
+    auto words_pos = words_.begin();
     for (int i = 0; i < words_.size(); i ++)
     {
-        fwrite (&words_ [i], sizeof (long), 1, output);
-        fwrite (&offsets [i], sizeof (long), 1, output);
+        fwrite (&(*words_pos), sizeof (long), 1, output);
+        fwrite (&offsets [i],  sizeof (long), 1, output);
+
+        ++words_pos;
     }
 }
 
 string IndexReverser::print_memory (off64_t bytes)
 {
     if (bytes == 0) return string ("0 Byte");
-    long k = 1024; // or 1024 for binary
+    long k = 1000; // or 1024 for binary
     char sizes [][6] = {"Bytes", "KB", "MB", "GB", "TB", "PB"};
     int i = (int) (log(bytes) / log(k));
 

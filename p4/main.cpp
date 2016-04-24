@@ -8,7 +8,20 @@ using namespace std;
 
 int main ()
 {
-    IndexReverser ir (string ("test.txt"), string ("output.txt"), string ("temp.txt"));
+    string input = "";
+    cout << "Please, set input file name." << endl;
+    cin >> input;
+
+    string output = "";
+    //cout << "Please, set output file name. (left empty for default output.bin)" << endl;
+    //cin >> output;
+
+    if (output == "")
+    {
+        output = "output.bin";
+    }
+
+    IndexReverser ir (input, output, string ("temp.bin"));
 
     ir.make ();
 
