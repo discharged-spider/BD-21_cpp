@@ -41,6 +41,20 @@ void IndexReverser::reverse_parts(FILE *input, FILE *output)
     assert (sizeof (int) == 4);
 
     typedef pair<long, long> dict_pair;
+
+    class dict_comp
+    {
+        public:
+        bool operator () (const dict_pair& a, const dict_pair& b)
+        {
+            if (a.first != b.first) return a.first < b.first;
+            return a.second < b.second;
+        };
+    };
+
+    dict_comp comp;
+
+    //set <dict_pair, dict_comp> words;
     vector <dict_pair> words;
 
     while (reader.available () > FIRST_STEP_LIMIT / 3 || reader.refresh () || reader.available () > 0)
@@ -72,6 +86,7 @@ void IndexReverser::reverse_parts(FILE *input, FILE *output)
                 }
                 auto word_id = reader.read<long> ();
 
+                //words.insert (dict_pair (word_id, doc_id));
                 words.push_back (dict_pair (word_id, doc_id));
             }
 
@@ -80,35 +95,32 @@ void IndexReverser::reverse_parts(FILE *input, FILE *output)
 
         std::cout << "First step progress: " << words.size() << " words" << std::endl;
 
-        auto comp = [] (dict_pair a, dict_pair b)
-        {
-            if (a.first != b.first) return a.first < b.first;
-            return a.second < b.second;
-        };
-
         std::sort (words.begin(), words.end (), comp);
 
         std::cout << "First step progress: sorted" << std::endl;
 
-        int last_pos = 0;
-        for (int i = 0; i <= words.size(); i ++)
+        //typedef set <dict_pair, dict_comp>::iterator iterator;
+        typedef vector <dict_pair>::iterator iterator;
+
+        iterator last_pos = words.begin ();
+        for (iterator i = words.begin (); true; ++i)
         {
-            if (i == words.size () || words [last_pos].first != words [i].first)
+            if (i == words.end () || last_pos -> first != i -> first)
             {
-                words_.insert (words [last_pos].first);
+                words_.insert (last_pos -> first);
 
-                fwrite (&words [last_pos].first, sizeof (long), 1, output);
+                fwrite (&(last_pos -> first), sizeof (long), 1, output);
 
-                int size = i - last_pos;
+                int size = (int)std::distance (last_pos, i);
                 fwrite (&size, sizeof (int), 1, output);
 
-                for (int j = last_pos; j < i; j ++)
+                for (iterator j = last_pos; j != i; ++j)
                 {
-                    assert (words [j].first == words [last_pos].first);
-                    fwrite (&words [j].second, sizeof (long), 1, output);
+                    assert (j -> first == last_pos -> first);
+                    fwrite (&(j -> second), sizeof (long), 1, output);
                 }
 
-                if (i == words.size ()) break;
+                if (i == words.end ()) break;
 
                 last_pos = i;
             }
@@ -116,6 +128,8 @@ void IndexReverser::reverse_parts(FILE *input, FILE *output)
 
         words.clear ();
     }
+
+    std::cout << "First step progress done" << std::endl;
 }
 
 void IndexReverser::create_index (FILE *input, FILE *output)
@@ -241,6 +255,8 @@ void IndexReverser::create_index (FILE *input, FILE *output)
 
         ++words_pos;
     }
+
+    std::cout << "Second step progress done" << std::endl;
 }
 
 string IndexReverser::print_memory (off64_t bytes)
