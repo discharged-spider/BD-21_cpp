@@ -4,7 +4,6 @@
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <boost/enable_shared_from_this.hpp>
-#include <boost/thread/thread.hpp
 
 #include <string>
 
