@@ -1,0 +1,15 @@
+a 1
+ab 10
+abc 2
+abcd 3
+abcdef 3
+b 12
+bc 3
+bcd 4
+bcde 43
+bcdef 3
+xb 34
+xbc 4
+xbcd 2
+xbcde 3
+xbcdef 4
